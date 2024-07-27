@@ -5,10 +5,13 @@ const session = require('express-session')
 const passport = require('passport')
 const connectDB = require('./db/connect')
 const path = require('path');
+const { MongoClient } = require('mongodb');
 const User = require('./model/user');
-const sendAnalysis = require('./sentiment');
+const Doc = require('./model/doc')
+const sendSentimentValue = require('./sentiment');
 require('dotenv').config()
 require('./config/passport')
+const port = 3000
 
 app.use(express.static('./public'))
 app.use(express.json())
@@ -26,6 +29,7 @@ app.get('/home' , (req , res)=>{
   res.sendFile(path.join(__dirname, './public', 'home.html'))
 })
 
+const client = new MongoClient(process.env.MONGO_URI , {useNewUrlParser: true, useUnifiedTopology: true})
 // Google OAuth routes
 app.get('/auth/google',
   passport.authenticate('google', {
@@ -68,16 +72,33 @@ app.post('/api/update_location', async (req, res) => {
   res.send(user);
 });
 
-const port = 3000;
+app.get('/therapists', async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db('test'); 
+    const collection = database.collection('therapist'); 
+    
+    const therapists = await collection.find().toArray();
+    
+    res.json(therapists);
+  } catch (error) {
+    console.error('Error fetching therapists:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    await client.close();
+  }
+
+});
 
 const start = async () => {
     try {
-      const SentimentObj = await sendAnalysis('http://localhost:8000/analyze', 'I love this product')
-      const polar = SentimentObj.polarity
-      console.log(polar)
+      const val = await sendSentimentValue('http://127.0.0.1:8000/analyze' , '')
+      if(val.polarity<0){
+        
+      }
       await connectDB(process.env.MONGO_URI);
       app.listen(port, () =>
-        console.log(`Server is listening on port ${port}...`)
+        console.log(`Server is listening on port http://localhost:${port}`)
       );
     } 
     catch (error) {

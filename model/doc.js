@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const TaskSchema = new mongoose.Schema({
+const DocSchema = new mongoose.Schema({
     name : {
         type: String,
         required: [true, 'cannot upload empty name'],
