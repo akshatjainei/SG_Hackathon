@@ -5,7 +5,8 @@ const session = require('express-session')
 const passport = require('passport')
 const connectDB = require('./db/connect')
 const path = require('path');
-const User = require('./model/user')
+const User = require('./model/user');
+const sendAnalysis = require('./sentiment');
 require('dotenv').config()
 require('./config/passport')
 
@@ -71,6 +72,9 @@ const port = 3000;
 
 const start = async () => {
     try {
+      const SentimentObj = await sendAnalysis('http://localhost:8000/analyze', 'I love this product')
+      const polar = SentimentObj.polarity
+      console.log(polar)
       await connectDB(process.env.MONGO_URI);
       app.listen(port, () =>
         console.log(`Server is listening on port ${port}...`)
