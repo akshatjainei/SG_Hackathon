@@ -5,6 +5,8 @@ const session = require('express-session')
 const passport = require('passport')
 const connectDB = require('./db/connect')
 const path = require('path');
+const run = require('./genModel')
+const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const User = require('./model/user');
 const Doc = require('./model/doc')
@@ -23,6 +25,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors());
 app.use('/api/v1/tasks',tasks);
 
 app.get('/home' , (req , res)=>{
@@ -93,8 +96,9 @@ app.get('/therapists', async (req, res) => {
 const start = async () => {
     try {
       const val = await sendSentimentValue('http://127.0.0.1:8000/analyze' , '')
-      if(val.polarity<0){
-        
+      console.log(val.polarity)
+      if(val.polarity<-0.5){
+        console.log('therapist')
       }
       await connectDB(process.env.MONGO_URI);
       app.listen(port, () =>

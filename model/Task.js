@@ -8,7 +8,6 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     required: [true, 'cannot upload empty journal'],
     trim: true,
-    maxlength: [20, 'name can not be more than 20 characters'],
   },
 })
 

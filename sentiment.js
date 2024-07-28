@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const axios = require('axios');
-const Task = require('./model/Task'); // Adjust the path as needed
+const Task = require('./model/Task');
 const connectDB = require('./db/connect')
 require('dotenv').config()
 
